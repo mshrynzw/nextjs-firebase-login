@@ -1,7 +1,20 @@
-import Image from "next/image";
+import React from "react"
+import AuthListener from "@/components/AuthListener"
+import ButtonLogout from "@/components/ButtonLogout"
 
-export default function Home() {
+const HomePage = async () => {
+
   return (
-    <div>test</div>
-  );
+    <AuthListener>
+      <div>
+        <h1>ホームページ</h1>
+        <div>
+          <p>ようこそ</p>
+          <ButtonLogout/>
+        </div>
+      </div>
+    </AuthListener>
+  )
 }
+
+export default HomePage
