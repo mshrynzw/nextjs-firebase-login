@@ -1,45 +1,44 @@
 "use client"
 
 import React, { useState } from "react"
-import { auth } from "@/lib/firebase"
-import { signInWithEmailAndPassword } from "firebase/auth"
-import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
+import { formAction } from "@/actions/formAction"
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const router = useRouter()
+  const [errorMessage, setErrorMessage] = useState("")
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleError = (error : string) => {
+    setErrorMessage(error)
+  }
+
+  const handleSubmit = async (e : React.FormEvent) => {
     e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      const user = userCredential.user
-      const token = await user.getIdToken()
-      Cookies.set("token", token, { expires: 7 })
-      router.push("/")
+      const { token } = await formAction(formData)
+      Cookies.set("token", token, { expires : 7 })
+      window.location.href = "/"
     } catch (error) {
-      console.error("Login error:", error)
+      handleError(error.message)
     }
   }
 
   return (
     <div>
       <h1>ログイン</h1>
-      <form onSubmit={handleLogin}>
+      {errorMessage && <p style={{ color : "red" }}>{errorMessage}</p>}
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
+          name="email"
           placeholder="メールアドレス"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
+          name="password"
           placeholder="パスワード"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button type="submit">ログイン</button>
